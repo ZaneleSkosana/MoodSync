@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "MoodSync",
+    "slug": "moodsyncapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "moodsync",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.moodsyncapp"
+    },
+    "android": {
+      "package": "com.moodsyncapp",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1E90FF"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "@wwdrew/expo-spotify-sdk",
+        {
+          "clientID": "cf3cacf78b9c447482a8f8b86bef3566",
+          "scheme": "moodsync",
+          "host": "spotify-auth"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "MoodSync uses your camera to estimate your current mood from your facial expression. Photos are analyzed in the moment and are not stored.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "MoodSync uses your approximate location to remember which environment (like Gym or Home) you tend to be in, and to check the local weather for music suggestions. This is entirely optional."
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "MoodSync briefly samples motion to estimate whether you're stationary, walking, or active, as one input into your detected mood."
+        }
+      ],
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#1E90FF"
+        }
+      ],
+      "expo-status-bar",
+      "expo-audio",
+      "expo-asset"
+    ]
+  }
+}

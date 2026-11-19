@@ -1,0 +1,1400 @@
+diff --git a/node_modules/react-native/src/private/animated/NativeAnimatedHelper.js b/node_modules/react-native/src/private/animated/NativeAnimatedHelper.js
+index 647355d..82655a3 100644
+--- a/node_modules/react-native/src/private/animated/NativeAnimatedHelper.js
++++ b/node_modules/react-native/src/private/animated/NativeAnimatedHelper.js
+@@ -103,7 +103,7 @@ function createNativeOperations(): NonNullable<typeof NativeAnimatedModule> {
+     methodNames.push('connectAnimatedNodeToShadowNodeFamily');
+   }
+   const nativeOperations: {
+-    [Values<typeof methodNames>]: (...ReadonlyArray<unknown>) => void,
++    [Values<typeof methodNames>]: (...$ReadOnlyArray<unknown>) => void,
+   } = {};
+   if (isSingleOpBatching) {
+     for (let ii = 0, length = methodNames.length; ii < length; ii++) {
+@@ -406,7 +406,7 @@ function assertNativeAnimatedModule(): void {
+ let _warnedMissingNativeAnimated = false;
+ 
+ function shouldUseNativeDriver(
+-  config: Readonly<{...AnimationConfig, ...}> | EventConfig<unknown>,
++  config: $ReadOnly<{...AnimationConfig, ...}> | EventConfig<unknown>,
+ ): boolean {
+   if (config.useNativeDriver == null) {
+     console.warn(
+diff --git a/node_modules/react-native/src/private/animated/createAnimatedPropsMemoHook.js b/node_modules/react-native/src/private/animated/createAnimatedPropsMemoHook.js
+index f6657e0..21062f7 100644
+--- a/node_modules/react-native/src/private/animated/createAnimatedPropsMemoHook.js
++++ b/node_modules/react-native/src/private/animated/createAnimatedPropsMemoHook.js
+@@ -24,32 +24,32 @@ type CompositeKey = {
+   [string]:
+     | CompositeKeyComponent
+     | AnimatedEvent
+-    | ReadonlyArray<unknown>
+-    | Readonly<{[string]: unknown}>,
++    | $ReadOnlyArray<unknown>
++    | $ReadOnly<{[string]: unknown}>,
+ };
+ 
+ type CompositeKeyComponent =
+   | AnimatedNode
+-  | ReadonlyArray<CompositeKeyComponent | null>
+-  | Readonly<{[string]: CompositeKeyComponent}>;
++  | $ReadOnlyArray<CompositeKeyComponent | null>
++  | $ReadOnly<{[string]: CompositeKeyComponent}>;
+ 
+-type $ReadOnlyCompositeKey = Readonly<{
+-  style?: Readonly<{[string]: CompositeKeyComponent}>,
++type $ReadOnlyCompositeKey = $ReadOnly<{
++  style?: $ReadOnly<{[string]: CompositeKeyComponent}>,
+   [string]:
+     | $ReadOnlyCompositeKeyComponent
+     | AnimatedEvent
+-    | ReadonlyArray<unknown>
+-    | Readonly<{[string]: unknown}>,
++    | $ReadOnlyArray<unknown>
++    | $ReadOnly<{[string]: unknown}>,
+ }>;
+ 
+ type $ReadOnlyCompositeKeyComponent =
+   | AnimatedNode
+-  | ReadonlyArray<$ReadOnlyCompositeKeyComponent | null>
+-  | Readonly<{[string]: $ReadOnlyCompositeKeyComponent}>;
++  | $ReadOnlyArray<$ReadOnlyCompositeKeyComponent | null>
++  | $ReadOnly<{[string]: $ReadOnlyCompositeKeyComponent}>;
+ 
+ type AnimatedPropsMemoHook = (
+   () => AnimatedProps,
+-  props: Readonly<{[string]: unknown}>,
++  props: $ReadOnly<{[string]: unknown}>,
+ ) => AnimatedProps;
+ 
+ /**
+@@ -62,14 +62,14 @@ export function createAnimatedPropsMemoHook(
+ ): AnimatedPropsMemoHook {
+   return function useAnimatedPropsMemo(
+     create: () => AnimatedProps,
+-    props: Readonly<{[string]: unknown}>,
++    props: $ReadOnly<{[string]: unknown}>,
+   ): AnimatedProps {
+     const compositeKey = useMemo(
+       () => createCompositeKeyForProps(props, allowlist),
+       [props],
+     );
+ 
+-    const prevRef = useRef<?Readonly<{
++    const prevRef = useRef<?$ReadOnly<{
+       compositeKey: typeof compositeKey,
+       node: AnimatedProps,
+     }>>();
+@@ -107,7 +107,7 @@ export function createAnimatedPropsMemoHook(
+  * returns null.
+  */
+ export function createCompositeKeyForProps(
+-  props: Readonly<{[string]: unknown}>,
++  props: $ReadOnly<{[string]: unknown}>,
+   allowlist: ?AnimatedPropsAllowlist,
+ ): $ReadOnlyCompositeKey | null {
+   let compositeKey: CompositeKey | null = null;
+@@ -160,8 +160,8 @@ export function createCompositeKeyForProps(
+  * If `array` contains no `AnimatedNode` instances, this returns null.
+  */
+ function createCompositeKeyForArray(
+-  array: ReadonlyArray<unknown>,
+-): ReadonlyArray<$ReadOnlyCompositeKeyComponent | null> | null {
++  array: $ReadOnlyArray<unknown>,
++): $ReadOnlyArray<$ReadOnlyCompositeKeyComponent | null> | null {
+   let compositeKey: Array<$ReadOnlyCompositeKeyComponent | null> | null = null;
+ 
+   for (let ii = 0, length = array.length; ii < length; ii++) {
+@@ -200,9 +200,9 @@ function createCompositeKeyForArray(
+  * If `object` contains no `AnimatedNode` instances, this returns null.
+  */
+ function createCompositeKeyForObject(
+-  object: Readonly<{[string]: unknown}>,
++  object: $ReadOnly<{[string]: unknown}>,
+   allowlist?: ?AnimatedStyleAllowlist,
+-): Readonly<{[string]: $ReadOnlyCompositeKeyComponent}> | null {
++): $ReadOnly<{[string]: $ReadOnlyCompositeKeyComponent}> | null {
+   let compositeKey: {[string]: $ReadOnlyCompositeKeyComponent} | null = null;
+ 
+   const keys = Object.keys(object);
+@@ -355,6 +355,6 @@ function areCompositeKeyComponentsEqual(
+ // this shim when they do.
+ // $FlowFixMe[method-unbinding]
+ const _hasOwnProp = Object.prototype.hasOwnProperty;
+-const hasOwn: (obj: Readonly<{...}>, prop: string) => boolean =
++const hasOwn: (obj: $ReadOnly<{...}>, prop: string) => boolean =
+   // $FlowFixMe[method-unbinding]
+   Object.hasOwn ?? ((obj, prop) => _hasOwnProp.call(obj, prop));
+diff --git a/node_modules/react-native/src/private/components/virtualcollection/VirtualCollectionView.js b/node_modules/react-native/src/private/components/virtualcollection/VirtualCollectionView.js
+index b1f0dda..863ea00 100644
+--- a/node_modules/react-native/src/private/components/virtualcollection/VirtualCollectionView.js
++++ b/node_modules/react-native/src/private/components/virtualcollection/VirtualCollectionView.js
+@@ -23,13 +23,13 @@ import {useCallback, useMemo, useState} from 'react';
+ 
+ export type VirtualCollectionLayoutComponent<TLayoutProps extends {...}> =
+   component(
+-    children: ReadonlyArray<React.Node>,
++    children: $ReadOnlyArray<React.Node>,
+     spacer: React.Node,
+     ...TLayoutProps
+   );
+ 
+-export type VirtualCollectionGenerator = Readonly<{
+-  initial: Readonly<{
++export type VirtualCollectionGenerator = $ReadOnly<{
++  initial: $ReadOnly<{
+     itemCount: number,
+     spacerStyle: (itemCount: number) => ViewStyleProp,
+   }>,
+diff --git a/node_modules/react-native/src/private/components/virtualcollection/column/VirtualColumn.js b/node_modules/react-native/src/private/components/virtualcollection/column/VirtualColumn.js
+index e1674d5..c59eb81 100644
+--- a/node_modules/react-native/src/private/components/virtualcollection/column/VirtualColumn.js
++++ b/node_modules/react-native/src/private/components/virtualcollection/column/VirtualColumn.js
+@@ -15,7 +15,7 @@ import VirtualColumnGenerator from './VirtualColumnGenerator';
+ import * as React from 'react';
+ 
+ component VirtualColumnLayout(
+-  children: ReadonlyArray<React.Node>,
++  children: $ReadOnlyArray<React.Node>,
+   spacer: React.Node,
+ ) {
+   return (
+diff --git a/node_modules/react-native/src/private/components/virtualcollection/row/VirtualRow.js b/node_modules/react-native/src/private/components/virtualcollection/row/VirtualRow.js
+index 92b4bbd..259c742 100644
+--- a/node_modules/react-native/src/private/components/virtualcollection/row/VirtualRow.js
++++ b/node_modules/react-native/src/private/components/virtualcollection/row/VirtualRow.js
+@@ -15,7 +15,7 @@ import VirtualRowGenerator from './VirtualRowGenerator';
+ import * as React from 'react';
+ 
+ component VirtualRowLayout(
+-  children: ReadonlyArray<React.Node>,
++  children: $ReadOnlyArray<React.Node>,
+   spacer: React.Node,
+ ) {
+   return (
+diff --git a/node_modules/react-native/src/private/components/virtualview/VirtualView.js b/node_modules/react-native/src/private/components/virtualview/VirtualView.js
+index f943687..24a2607 100644
+--- a/node_modules/react-native/src/private/components/virtualview/VirtualView.js
++++ b/node_modules/react-native/src/private/components/virtualview/VirtualView.js
+@@ -36,14 +36,14 @@ export enum VirtualViewRenderState {
+   None = 2,
+ }
+ 
+-export type Rect = Readonly<{
++export type Rect = $ReadOnly<{
+   x: number,
+   y: number,
+   width: number,
+   height: number,
+ }>;
+ 
+-export type ModeChangeEvent = Readonly<{
++export type ModeChangeEvent = $ReadOnly<{
+   ...Omit<NativeModeChangeEvent, 'mode'>,
+   renderState: VirtualViewRenderState,
+   mode: VirtualViewMode,
+diff --git a/node_modules/react-native/src/private/components/virtualview/VirtualViewExperimentalNativeComponent.js b/node_modules/react-native/src/private/components/virtualview/VirtualViewExperimentalNativeComponent.js
+index c640b5a..678f7f1 100644
+--- a/node_modules/react-native/src/private/components/virtualview/VirtualViewExperimentalNativeComponent.js
++++ b/node_modules/react-native/src/private/components/virtualview/VirtualViewExperimentalNativeComponent.js
+@@ -18,7 +18,7 @@ import type {HostComponent} from '../../types/HostComponent';
+ 
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ 
+-export type NativeModeChangeEvent = Readonly<{
++export type NativeModeChangeEvent = $ReadOnly<{
+   /**
+    * Virtualization mode of the target view.
+    *
+@@ -34,7 +34,7 @@ export type NativeModeChangeEvent = Readonly<{
+   /**
+    * Rect of the target view, relative to the nearest ancestor scroll container.
+    */
+-  targetRect: Readonly<{
++  targetRect: $ReadOnly<{
+     x: Double,
+     y: Double,
+     width: Double,
+@@ -51,7 +51,7 @@ export type NativeModeChangeEvent = Readonly<{
+    *
+    * This can be used to determine whether and how much new content to render.
+    */
+-  thresholdRect: Readonly<{
++  thresholdRect: $ReadOnly<{
+     x: Double,
+     y: Double,
+     width: Double,
+@@ -59,7 +59,7 @@ export type NativeModeChangeEvent = Readonly<{
+   }>,
+ }>;
+ 
+-type VirtualViewExperimentalNativeProps = Readonly<{
++type VirtualViewExperimentalNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   /**
+@@ -92,9 +92,9 @@ type VirtualViewExperimentalNativeProps = Readonly<{
+ }>;
+ 
+ // TODO: Rename to eliminate "Experimental" suffix in the name.
+-export default codegenNativeComponent<VirtualViewExperimentalNativeProps>(
++export default (codegenNativeComponent<VirtualViewExperimentalNativeProps>(
+   'VirtualViewExperimental',
+   {
+     interfaceOnly: true,
+   },
+-) as HostComponent<VirtualViewExperimentalNativeProps>;
++): HostComponent<VirtualViewExperimentalNativeProps>);
+diff --git a/node_modules/react-native/src/private/components/virtualview/VirtualViewNativeComponent.js b/node_modules/react-native/src/private/components/virtualview/VirtualViewNativeComponent.js
+index 4ba5b68..44a4b9d 100644
+--- a/node_modules/react-native/src/private/components/virtualview/VirtualViewNativeComponent.js
++++ b/node_modules/react-native/src/private/components/virtualview/VirtualViewNativeComponent.js
+@@ -18,7 +18,7 @@ import type {HostComponent} from '../../types/HostComponent';
+ 
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ 
+-export type NativeModeChangeEvent = Readonly<{
++export type NativeModeChangeEvent = $ReadOnly<{
+   /**
+    * Virtualization mode of the target view.
+    *
+@@ -34,7 +34,7 @@ export type NativeModeChangeEvent = Readonly<{
+   /**
+    * Rect of the target view, relative to the nearest ancestor scroll container.
+    */
+-  targetRect: Readonly<{
++  targetRect: $ReadOnly<{
+     x: Double,
+     y: Double,
+     width: Double,
+@@ -51,7 +51,7 @@ export type NativeModeChangeEvent = Readonly<{
+    *
+    * This can be used to determine whether and how much new content to render.
+    */
+-  thresholdRect: Readonly<{
++  thresholdRect: $ReadOnly<{
+     x: Double,
+     y: Double,
+     width: Double,
+@@ -59,7 +59,7 @@ export type NativeModeChangeEvent = Readonly<{
+   }>,
+ }>;
+ 
+-type VirtualViewNativeProps = Readonly<{
++type VirtualViewNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   /**
+@@ -91,6 +91,6 @@ type VirtualViewNativeProps = Readonly<{
+   onModeChange?: ?DirectEventHandler<NativeModeChangeEvent>,
+ }>;
+ 
+-export default codegenNativeComponent<VirtualViewNativeProps>('VirtualView', {
++export default (codegenNativeComponent<VirtualViewNativeProps>('VirtualView', {
+   interfaceOnly: true,
+-}) as HostComponent<VirtualViewNativeProps>;
++}): HostComponent<VirtualViewNativeProps>);
+diff --git a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/BorderBox.js b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/BorderBox.js
+index af12cdb..22d3f7f 100644
+--- a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/BorderBox.js
++++ b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/BorderBox.js
+@@ -16,9 +16,9 @@ import * as React from 'react';
+ 
+ const View = require('../../../../../Libraries/Components/View/View').default;
+ 
+-type Props = Readonly<{
++type Props = $ReadOnly<{
+   children: React.Node,
+-  box?: ?Readonly<{
++  box?: ?$ReadOnly<{
+     top: number,
+     right: number,
+     bottom: number,
+diff --git a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/BoxInspector.js b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/BoxInspector.js
+index 59aa4c8..1b76fb8 100644
+--- a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/BoxInspector.js
++++ b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/BoxInspector.js
+@@ -31,7 +31,7 @@ const blank = {
+   bottom: 0,
+ };
+ 
+-type BoxInspectorProps = Readonly<{
++type BoxInspectorProps = $ReadOnly<{
+   style: ViewStyleProp,
+   frame: ?InspectedElementFrame,
+ }>;
+@@ -57,10 +57,10 @@ function BoxInspector({style, frame}: BoxInspectorProps): React.Node {
+   );
+ }
+ 
+-type BoxContainerProps = Readonly<{
++type BoxContainerProps = $ReadOnly<{
+   title: string,
+   titleStyle?: TextStyleProp,
+-  box: Readonly<{
++  box: $ReadOnly<{
+     top: number,
+     left: number,
+     right: number,
+diff --git a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/ElementBox.js b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/ElementBox.js
+index 08b4e97..668e898 100644
+--- a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/ElementBox.js
++++ b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/ElementBox.js
+@@ -25,7 +25,7 @@ const Dimensions =
+ const BorderBox = require('./BorderBox').default;
+ const resolveBoxStyle = require('./resolveBoxStyle').default;
+ 
+-type Props = Readonly<{
++type Props = $ReadOnly<{
+   frame: InspectedElementFrame,
+   style?: ?ViewStyleProp,
+ }>;
+diff --git a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/ElementProperties.js b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/ElementProperties.js
+index 8a79289..ed32a6e 100644
+--- a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/ElementProperties.js
++++ b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/ElementProperties.js
+@@ -30,7 +30,7 @@ const mapWithSeparator =
+ const BoxInspector = require('./BoxInspector').default;
+ const StyleInspector = require('./StyleInspector').default;
+ 
+-type Props = Readonly<{
++type Props = $ReadOnly<{
+   hierarchy: ?InspectorData['hierarchy'],
+   style?: ?ViewStyleProp,
+   frame?: ?Object,
+diff --git a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/Inspector.js b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/Inspector.js
+index e56629c..81cb0cc 100644
+--- a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/Inspector.js
++++ b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/Inspector.js
+@@ -41,7 +41,7 @@ const {useState} = React;
+ type PanelPosition = 'top' | 'bottom';
+ 
+ export type InspectedElementFrame = TouchedViewDataAtPoint['frame'];
+-export type InspectedElement = Readonly<{
++export type InspectedElement = $ReadOnly<{
+   frame: InspectedElementFrame,
+   style?: ViewStyleProp,
+ }>;
+diff --git a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/InspectorOverlay.js b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/InspectorOverlay.js
+index 56af66e..c38fda8 100644
+--- a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/InspectorOverlay.js
++++ b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/InspectorOverlay.js
+@@ -20,7 +20,7 @@ const StyleSheet =
+   require('../../../../../Libraries/StyleSheet/StyleSheet').default;
+ const ElementBox = require('./ElementBox').default;
+ 
+-type Props = Readonly<{
++type Props = $ReadOnly<{
+   inspected?: ?InspectedElement,
+   onTouchPoint: (locationX: number, locationY: number) => void,
+   externalInspectionActive?: boolean,
+diff --git a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/InspectorPanel.js b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/InspectorPanel.js
+index 9e5d04f..98b3626 100644
+--- a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/InspectorPanel.js
++++ b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/InspectorPanel.js
+@@ -25,7 +25,7 @@ const StyleSheet =
+ const Text = require('../../../../../Libraries/Text/Text').default;
+ const ElementProperties = require('./ElementProperties').default;
+ 
+-type Props = Readonly<{
++type Props = $ReadOnly<{
+   devtoolsIsOpen: boolean,
+   inspecting: boolean,
+   setInspecting: (val: boolean) => void,
+@@ -84,7 +84,7 @@ class InspectorPanel extends React.Component<Props> {
+   }
+ }
+ 
+-type InspectorPanelButtonProps = Readonly<{
++type InspectorPanelButtonProps = $ReadOnly<{
+   onClick: (val: boolean) => void,
+   pressed: boolean,
+   title: string,
+diff --git a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/StyleInspector.js b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/StyleInspector.js
+index aa3d63c..f03f9e9 100644
+--- a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/StyleInspector.js
++++ b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/StyleInspector.js
+@@ -20,7 +20,7 @@ const StyleSheet =
+   require('../../../../../Libraries/StyleSheet/StyleSheet').default;
+ const Text = require('../../../../../Libraries/Text/Text').default;
+ 
+-type Props = Readonly<{
++type Props = $ReadOnly<{
+   style?: ?____FlattenStyleProp_Internal<ViewStyleProp>,
+ }>;
+ 
+diff --git a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/resolveBoxStyle.js b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/resolveBoxStyle.js
+index 23ae447..40e1b00 100644
+--- a/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/resolveBoxStyle.js
++++ b/node_modules/react-native/src/private/devsupport/devmenu/elementinspector/resolveBoxStyle.js
+@@ -26,7 +26,7 @@ const I18nManager =
+ function resolveBoxStyle(
+   prefix: string,
+   style: Object,
+-): ?Readonly<{
++): ?$ReadOnly<{
+   bottom: number,
+   left: number,
+   right: number,
+diff --git a/node_modules/react-native/src/private/renderer/events/LegacySyntheticEvent.js b/node_modules/react-native/src/private/renderer/events/LegacySyntheticEvent.js
+index 5dfbcc2..353985a 100644
+--- a/node_modules/react-native/src/private/renderer/events/LegacySyntheticEvent.js
++++ b/node_modules/react-native/src/private/renderer/events/LegacySyntheticEvent.js
+@@ -13,14 +13,14 @@ import Event, {type EventInit} from '../../webapis/dom/events/Event';
+ // flowlint unsafe-getters-setters:off
+ 
+ export type DispatchConfig =
+-  | Readonly<{registrationName: string, dependencies?: ReadonlyArray<string>}>
+-  | Readonly<{
+-      phasedRegistrationNames: Readonly<{
++  | $ReadOnly<{registrationName: string, dependencies?: $ReadOnlyArray<string>}>
++  | $ReadOnly<{
++      phasedRegistrationNames: $ReadOnly<{
+         bubbled: string,
+         captured: string,
+         skipBubbling?: ?boolean,
+       }>,
+-      dependencies?: ReadonlyArray<string>,
++      dependencies?: $ReadOnlyArray<string>,
+     }>;
+ 
+ /**
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/ActivityIndicatorViewNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/ActivityIndicatorViewNativeComponent.js
+index 123a768..90337c9 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/ActivityIndicatorViewNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/ActivityIndicatorViewNativeComponent.js
+@@ -15,7 +15,7 @@ import type {HostComponent} from '../../types/HostComponent';
+ 
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ 
+-type RCTActivityIndicatorViewNativeProps = Readonly<{
++type RCTActivityIndicatorViewNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   /**
+@@ -48,9 +48,9 @@ type RCTActivityIndicatorViewNativeProps = Readonly<{
+   size?: WithDefault<'small' | 'large', 'small'>,
+ }>;
+ 
+-export default codegenNativeComponent<RCTActivityIndicatorViewNativeProps>(
++export default (codegenNativeComponent<RCTActivityIndicatorViewNativeProps>(
+   'ActivityIndicatorView',
+   {
+     paperComponentName: 'RCTActivityIndicatorView',
+   },
+-) as HostComponent<RCTActivityIndicatorViewNativeProps>;
++): HostComponent<RCTActivityIndicatorViewNativeProps>);
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidDrawerLayoutNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidDrawerLayoutNativeComponent.js
+index 6c935ae..bd4bf77 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidDrawerLayoutNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidDrawerLayoutNativeComponent.js
+@@ -22,15 +22,15 @@ import codegenNativeCommands from '../../../../Libraries/Utilities/codegenNative
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ import * as React from 'react';
+ 
+-type DrawerStateEvent = Readonly<{
++type DrawerStateEvent = $ReadOnly<{
+   drawerState: Int32,
+ }>;
+ 
+-type DrawerSlideEvent = Readonly<{
++type DrawerSlideEvent = $ReadOnly<{
+   offset: Float,
+ }>;
+ 
+-type AndroidDrawerLayoutNativeProps = Readonly<{
++type AndroidDrawerLayoutNativeProps = $ReadOnly<{
+   ...ViewProps,
+   /**
+    * Determines whether the keyboard gets dismissed in response to a drag.
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidHorizontalScrollContentViewNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidHorizontalScrollContentViewNativeComponent.js
+index b5eb751..72cf65e 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidHorizontalScrollContentViewNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidHorizontalScrollContentViewNativeComponent.js
+@@ -13,7 +13,7 @@ import type {HostComponent} from '../../types/HostComponent';
+ 
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ 
+-type AndroidHorizontalScrollContentViewNativeProps = Readonly<{
++type AndroidHorizontalScrollContentViewNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   removeClippedSubviews?: ?boolean,
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwipeRefreshLayoutNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwipeRefreshLayoutNativeComponent.js
+index 7d2385c..29e2f6c 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwipeRefreshLayoutNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwipeRefreshLayoutNativeComponent.js
+@@ -21,7 +21,7 @@ import codegenNativeCommands from '../../../../Libraries/Utilities/codegenNative
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ import * as React from 'react';
+ 
+-type AndroidSwipeRefreshLayoutNativeProps = Readonly<{
++type AndroidSwipeRefreshLayoutNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   /**
+@@ -31,7 +31,7 @@ type AndroidSwipeRefreshLayoutNativeProps = Readonly<{
+   /**
+    * The colors (at least one) that will be used to draw the refresh indicator.
+    */
+-  colors?: ?ReadonlyArray<ColorValue>,
++  colors?: ?$ReadOnlyArray<ColorValue>,
+   /**
+    * The background color of the refresh indicator.
+    */
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwitchNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwitchNativeComponent.js
+index 14bff1e..273d73f 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwitchNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/AndroidSwitchNativeComponent.js
+@@ -21,12 +21,12 @@ import codegenNativeCommands from '../../../../Libraries/Utilities/codegenNative
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ import * as React from 'react';
+ 
+-type AndroidSwitchChangeEvent = Readonly<{
++type AndroidSwitchChangeEvent = $ReadOnly<{
+   value: boolean,
+   target: Int32,
+ }>;
+ 
+-type AndroidSwitchNativeProps = Readonly<{
++type AndroidSwitchNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   // Props
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/DebuggingOverlayNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/DebuggingOverlayNativeComponent.js
+index 9242670..ce08555 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/DebuggingOverlayNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/DebuggingOverlayNativeComponent.js
+@@ -16,7 +16,7 @@ import codegenNativeCommands from '../../../../Libraries/Utilities/codegenNative
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ import * as React from 'react';
+ 
+-type DebuggingOverlayNativeProps = Readonly<{
++type DebuggingOverlayNativeProps = $ReadOnly<{
+   ...ViewProps,
+ }>;
+ export type DebuggingOverlayNativeComponentType =
+@@ -38,11 +38,11 @@ export type ElementRectangle = {
+ interface NativeCommands {
+   +highlightTraceUpdates: (
+     viewRef: React.ElementRef<DebuggingOverlayNativeComponentType>,
+-    updates: ReadonlyArray<TraceUpdate>,
++    updates: $ReadOnlyArray<TraceUpdate>,
+   ) => void;
+   +highlightElements: (
+     viewRef: React.ElementRef<DebuggingOverlayNativeComponentType>,
+-    elements: ReadonlyArray<ElementRectangle>,
++    elements: $ReadOnlyArray<ElementRectangle>,
+   ) => void;
+   +clearElementsHighlights: (
+     viewRef: React.ElementRef<DebuggingOverlayNativeComponentType>,
+@@ -57,6 +57,6 @@ export const Commands: NativeCommands = codegenNativeCommands<NativeCommands>({
+   ],
+ });
+ 
+-export default codegenNativeComponent<DebuggingOverlayNativeProps>(
++export default (codegenNativeComponent<DebuggingOverlayNativeProps>(
+   'DebuggingOverlay',
+-) as HostComponent<DebuggingOverlayNativeProps>;
++): HostComponent<DebuggingOverlayNativeProps>);
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/ProgressBarAndroidNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/ProgressBarAndroidNativeComponent.js
+index 2e0b59c..31fdced 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/ProgressBarAndroidNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/ProgressBarAndroidNativeComponent.js
+@@ -18,7 +18,7 @@ import type {HostComponent} from '../../types/HostComponent';
+ 
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ 
+-type AndroidProgressBarNativeProps = Readonly<{
++type AndroidProgressBarNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   //Props
+@@ -31,9 +31,9 @@ type AndroidProgressBarNativeProps = Readonly<{
+   testID?: WithDefault<string, ''>,
+ }>;
+ 
+-export default codegenNativeComponent<AndroidProgressBarNativeProps>(
++export default (codegenNativeComponent<AndroidProgressBarNativeProps>(
+   'AndroidProgressBar',
+   {
+     interfaceOnly: true,
+   },
+-) as HostComponent<AndroidProgressBarNativeProps>;
++): HostComponent<AndroidProgressBarNativeProps>);
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/PullToRefreshViewNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/PullToRefreshViewNativeComponent.js
+index 061717b..64b0110 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/PullToRefreshViewNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/PullToRefreshViewNativeComponent.js
+@@ -21,7 +21,7 @@ import codegenNativeCommands from '../../../../Libraries/Utilities/codegenNative
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ import * as React from 'react';
+ 
+-type PullToRefreshNativeProps = Readonly<{
++type PullToRefreshNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   /**
+@@ -65,10 +65,10 @@ export const Commands: NativeCommands = codegenNativeCommands<NativeCommands>({
+   supportedCommands: ['setNativeRefreshing'],
+ });
+ 
+-export default codegenNativeComponent<PullToRefreshNativeProps>(
++export default (codegenNativeComponent<PullToRefreshNativeProps>(
+   'PullToRefreshView',
+   {
+     paperComponentName: 'RCTRefreshControl',
+     excludedPlatforms: ['android'],
+   },
+-) as HostComponent<PullToRefreshNativeProps>;
++): HostComponent<PullToRefreshNativeProps>);
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTInputAccessoryViewNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTInputAccessoryViewNativeComponent.js
+index 66e1e02..c205ba0 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTInputAccessoryViewNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTInputAccessoryViewNativeComponent.js
+@@ -14,16 +14,16 @@ import type {HostComponent} from '../../types/HostComponent';
+ 
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ 
+-type InputAccessoryNativeProps = Readonly<{
++type InputAccessoryNativeProps = $ReadOnly<{
+   ...ViewProps,
+   backgroundColor?: ?ColorValue,
+ }>;
+ 
+-export default codegenNativeComponent<InputAccessoryNativeProps>(
++export default (codegenNativeComponent<InputAccessoryNativeProps>(
+   'InputAccessory',
+   {
+     interfaceOnly: true,
+     paperComponentName: 'RCTInputAccessoryView',
+     excludedPlatforms: ['android'],
+   },
+-) as HostComponent<InputAccessoryNativeProps>;
++): HostComponent<InputAccessoryNativeProps>);
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTModalHostViewNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTModalHostViewNativeComponent.js
+index eaf91f1..b5aa18a 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTModalHostViewNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTModalHostViewNativeComponent.js
+@@ -18,11 +18,11 @@ import type {HostComponent} from '../../types/HostComponent';
+ 
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ 
+-type OrientationChangeEvent = Readonly<{
++type OrientationChangeEvent = $ReadOnly<{
+   orientation: 'portrait' | 'landscape',
+ }>;
+ 
+-type RCTModalHostViewNativeProps = Readonly<{
++type RCTModalHostViewNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   /**
+@@ -124,7 +124,7 @@ type RCTModalHostViewNativeProps = Readonly<{
+    * See https://reactnative.dev/docs/modal#supportedorientations
+    */
+   supportedOrientations?: WithDefault<
+-    ReadonlyArray<
++    $ReadOnlyArray<
+       | 'portrait'
+       | 'portrait-upside-down'
+       | 'landscape'
+@@ -147,10 +147,10 @@ type RCTModalHostViewNativeProps = Readonly<{
+   identifier?: WithDefault<Int32, 0>,
+ }>;
+ 
+-export default codegenNativeComponent<RCTModalHostViewNativeProps>(
++export default (codegenNativeComponent<RCTModalHostViewNativeProps>(
+   'ModalHostView',
+   {
+     interfaceOnly: true,
+     paperComponentName: 'RCTModalHostView',
+   },
+-) as HostComponent<RCTModalHostViewNativeProps>;
++): HostComponent<RCTModalHostViewNativeProps>);
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTSafeAreaViewNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTSafeAreaViewNativeComponent.js
+index 546f4fa..e78c722 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTSafeAreaViewNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/RCTSafeAreaViewNativeComponent.js
+@@ -13,16 +13,16 @@ import type {HostComponent} from '../../types/HostComponent';
+ 
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ 
+-type RCTSafeAreaViewNativeProps = Readonly<{
++type RCTSafeAreaViewNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   // No props
+ }>;
+ 
+-export default codegenNativeComponent<RCTSafeAreaViewNativeProps>(
++export default (codegenNativeComponent<RCTSafeAreaViewNativeProps>(
+   'SafeAreaView',
+   {
+     paperComponentName: 'RCTSafeAreaView',
+     interfaceOnly: true,
+   },
+-) as HostComponent<RCTSafeAreaViewNativeProps>;
++): HostComponent<RCTSafeAreaViewNativeProps>);
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/SwitchNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/SwitchNativeComponent.js
+index 6c6a2bc..cbcec93 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/SwitchNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/SwitchNativeComponent.js
+@@ -21,12 +21,12 @@ import codegenNativeCommands from '../../../../Libraries/Utilities/codegenNative
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ import * as React from 'react';
+ 
+-type NativeSwitchChangeEvent = Readonly<{
++type NativeSwitchChangeEvent = $ReadOnly<{
+   value: boolean,
+   target: Int32,
+ }>;
+ 
+-type SwitchNativeProps = Readonly<{
++type SwitchNativeProps = $ReadOnly<{
+   ...ViewProps,
+ 
+   // Props
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/components/UnimplementedNativeViewNativeComponent.js b/node_modules/react-native/src/private/specs_DEPRECATED/components/UnimplementedNativeViewNativeComponent.js
+index b99df0a..00415eb 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/components/UnimplementedNativeViewNativeComponent.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/components/UnimplementedNativeViewNativeComponent.js
+@@ -14,13 +14,13 @@ import type {HostComponent} from '../../types/HostComponent';
+ 
+ import codegenNativeComponent from '../../../../Libraries/Utilities/codegenNativeComponent';
+ 
+-type UnimplementedNativeViewNativeProps = Readonly<{
++type UnimplementedNativeViewNativeProps = $ReadOnly<{
+   ...ViewProps,
+   name?: WithDefault<string, ''>,
+ }>;
+ 
+ // NOTE: This component is not implemented in paper
+ // Do not require this file in paper builds
+-export default codegenNativeComponent<UnimplementedNativeViewNativeProps>(
++export default (codegenNativeComponent<UnimplementedNativeViewNativeProps>(
+   'UnimplementedNativeView',
+-) as HostComponent<UnimplementedNativeViewNativeProps>;
++): HostComponent<UnimplementedNativeViewNativeProps>);
+diff --git a/node_modules/react-native/src/private/specs_DEPRECATED/modules/NativeImageLoaderIOS.js b/node_modules/react-native/src/private/specs_DEPRECATED/modules/NativeImageLoaderIOS.js
+index c9cf98c..86c89f1 100644
+--- a/node_modules/react-native/src/private/specs_DEPRECATED/modules/NativeImageLoaderIOS.js
++++ b/node_modules/react-native/src/private/specs_DEPRECATED/modules/NativeImageLoaderIOS.js
+@@ -16,7 +16,7 @@ import * as TurboModuleRegistry from '../../../../Libraries/TurboModule/TurboMod
+ export interface Spec extends TurboModule {
+   +getConstants: () => {};
+   // Return [width, height] of image uri
+-  +getSize: (uri: string) => Promise<ReadonlyArray<number>>;
++  +getSize: (uri: string) => Promise<$ReadOnlyArray<number>>;
+   +getSizeWithHeaders: (
+     uri: string,
+     headers: Object,
+diff --git a/node_modules/react-native/src/private/styles/composeStyles.js b/node_modules/react-native/src/private/styles/composeStyles.js
+index 36d1fc5..c46e052 100644
+--- a/node_modules/react-native/src/private/styles/composeStyles.js
++++ b/node_modules/react-native/src/private/styles/composeStyles.js
+@@ -16,7 +16,7 @@
+ export default function composeStyles<T, U extends T, V extends T>(
+   style1: ?U,
+   style2: ?V,
+-): ?(T | ReadonlyArray<T>) {
++): ?(T | $ReadOnlyArray<T>) {
+   if (style1 == null) {
+     return style2;
+   }
+diff --git a/node_modules/react-native/src/private/webapis/dom/events/Event.js b/node_modules/react-native/src/private/webapis/dom/events/Event.js
+index f918f97..14c7f9d 100644
+--- a/node_modules/react-native/src/private/webapis/dom/events/Event.js
++++ b/node_modules/react-native/src/private/webapis/dom/events/Event.js
+@@ -160,7 +160,7 @@ export default class Event {
+     return this._type;
+   }
+ 
+-  composedPath(): ReadonlyArray<EventTarget> {
++  composedPath(): $ReadOnlyArray<EventTarget> {
+     return getComposedPath(this).slice();
+   }
+ 
+diff --git a/node_modules/react-native/src/private/webapis/dom/events/EventHandlerAttributes.js b/node_modules/react-native/src/private/webapis/dom/events/EventHandlerAttributes.js
+index 450bd46..7bb9b4b 100644
+--- a/node_modules/react-native/src/private/webapis/dom/events/EventHandlerAttributes.js
++++ b/node_modules/react-native/src/private/webapis/dom/events/EventHandlerAttributes.js
+@@ -43,7 +43,7 @@
+ import type EventTarget from './EventTarget';
+ import type {EventCallback} from './EventTarget';
+ 
+-type EventHandler = Readonly<{
++type EventHandler = $ReadOnly<{
+   handleEvent: EventCallback,
+ }>;
+ type EventHandlerAttributeMap = Map<string, EventHandler | null>;
+diff --git a/node_modules/react-native/src/private/webapis/dom/events/EventTarget.js b/node_modules/react-native/src/private/webapis/dom/events/EventTarget.js
+index 81b669b..3d7b207 100644
+--- a/node_modules/react-native/src/private/webapis/dom/events/EventTarget.js
++++ b/node_modules/react-native/src/private/webapis/dom/events/EventTarget.js
+@@ -42,11 +42,11 @@ export type EventHandler = interface {
+ };
+ export type EventListener = EventCallback | EventHandler;
+ 
+-export type EventListenerOptions = Readonly<{
++export type EventListenerOptions = $ReadOnly<{
+   capture?: boolean,
+ }>;
+ 
+-export type AddEventListenerOptions = Readonly<{
++export type AddEventListenerOptions = $ReadOnly<{
+   ...EventListenerOptions,
+   passive?: boolean,
+   once?: boolean,
+@@ -328,7 +328,7 @@ function dispatch(eventTarget: EventTarget, event: Event): void {
+ function getEventPath(
+   eventTarget: EventTarget,
+   event: Event,
+-): ReadonlyArray<EventTarget> {
++): $ReadOnlyArray<EventTarget> {
+   const path = [];
+   let target: EventTarget | null = eventTarget;
+ 
+diff --git a/node_modules/react-native/src/private/webapis/dom/events/internals/EventInternals.js b/node_modules/react-native/src/private/webapis/dom/events/internals/EventInternals.js
+index 32f36e2..41379d9 100644
+--- a/node_modules/react-native/src/private/webapis/dom/events/internals/EventInternals.js
++++ b/node_modules/react-native/src/private/webapis/dom/events/internals/EventInternals.js
+@@ -48,14 +48,14 @@ export function setCurrentTarget(
+   event[CURRENT_TARGET_KEY] = currentTarget;
+ }
+ 
+-export function getComposedPath(event: Event): ReadonlyArray<EventTarget> {
++export function getComposedPath(event: Event): $ReadOnlyArray<EventTarget> {
+   // $FlowExpectedError[prop-missing]
+   return event[COMPOSED_PATH_KEY];
+ }
+ 
+ export function setComposedPath(
+   event: Event,
+-  composedPath: ReadonlyArray<EventTarget>,
++  composedPath: $ReadOnlyArray<EventTarget>,
+ ): void {
+   // $FlowExpectedError[prop-missing]
+   event[COMPOSED_PATH_KEY] = composedPath;
+diff --git a/node_modules/react-native/src/private/webapis/dom/nodes/ReadOnlyElement.js b/node_modules/react-native/src/private/webapis/dom/nodes/ReadOnlyElement.js
+index 1f0d82c..f02643e 100644
+--- a/node_modules/react-native/src/private/webapis/dom/nodes/ReadOnlyElement.js
++++ b/node_modules/react-native/src/private/webapis/dom/nodes/ReadOnlyElement.js
+@@ -217,7 +217,7 @@ export default class ReadOnlyElement extends ReadOnlyNode {
+   }
+ }
+ 
+-function getChildElements(node: ReadOnlyNode): ReadonlyArray<ReadOnlyElement> {
++function getChildElements(node: ReadOnlyNode): $ReadOnlyArray<ReadOnlyElement> {
+   // $FlowFixMe[incompatible-type]
+   return getChildNodes(
+     node,
+diff --git a/node_modules/react-native/src/private/webapis/dom/nodes/ReadOnlyNode.js b/node_modules/react-native/src/private/webapis/dom/nodes/ReadOnlyNode.js
+index 3286af0..4878f9d 100644
+--- a/node_modules/react-native/src/private/webapis/dom/nodes/ReadOnlyNode.js
++++ b/node_modules/react-native/src/private/webapis/dom/nodes/ReadOnlyNode.js
+@@ -366,7 +366,7 @@ export type ReadOnlyNodeWithEventTarget = ReadOnlyNode & EventTarget;
+ export function getChildNodes(
+   node: ReadOnlyNode,
+   filter?: (node: ReadOnlyNode) => boolean,
+-): ReadonlyArray<ReadOnlyNode> {
++): $ReadOnlyArray<ReadOnlyNode> {
+   const shadowNode = getNativeNodeReference(node);
+ 
+   if (shadowNode == null) {
+@@ -388,7 +388,7 @@ export function getChildNodes(
+ 
+ function getNodeSiblingsAndPosition(
+   node: ReadOnlyNode,
+-): [ReadonlyArray<ReadOnlyNode>, number] {
++): [$ReadOnlyArray<ReadOnlyNode>, number] {
+   const parent = node.parentNode;
+   if (parent == null) {
+     // This node is the root or it's disconnected.
+diff --git a/node_modules/react-native/src/private/webapis/dom/nodes/specs/NativeDOM.js b/node_modules/react-native/src/private/webapis/dom/nodes/specs/NativeDOM.js
+index 1cb40bc..8013110 100644
+--- a/node_modules/react-native/src/private/webapis/dom/nodes/specs/NativeDOM.js
++++ b/node_modules/react-native/src/private/webapis/dom/nodes/specs/NativeDOM.js
+@@ -58,7 +58,7 @@ export interface Spec extends TurboModule {
+ 
+   +getChildNodes: (
+     nativeNodeReference: unknown /* NativeNodeReference */,
+-  ) => ReadonlyArray<unknown> /* $ReadOnlyArray<InstanceHandle> */;
++  ) => $ReadOnlyArray<unknown> /* $ReadOnlyArray<InstanceHandle> */;
+ 
+   +getElementById?: (
+     nativeNodeReference: unknown /* NativeNodeReference */,
+@@ -79,24 +79,24 @@ export interface Spec extends TurboModule {
+ 
+   +getBorderWidth: (
+     nativeElementReference: unknown /* NativeElementReference */,
+-  ) => ReadonlyArray<number> /* [topWidth: number, rightWidth: number, bottomWidth: number, leftWidth: number] */;
++  ) => $ReadOnlyArray<number> /* [topWidth: number, rightWidth: number, bottomWidth: number, leftWidth: number] */;
+ 
+   +getBoundingClientRect: (
+     nativeElementReference: unknown /* NativeElementReference */,
+     includeTransform: boolean,
+-  ) => ReadonlyArray<number> /* [x: number, y: number, width: number, height: number] */;
++  ) => $ReadOnlyArray<number> /* [x: number, y: number, width: number, height: number] */;
+ 
+   +getInnerSize: (
+     nativeElementReference: unknown /* NativeElementReference */,
+-  ) => ReadonlyArray<number> /* [width: number, height: number] */;
++  ) => $ReadOnlyArray<number> /* [width: number, height: number] */;
+ 
+   +getScrollPosition: (
+     nativeElementReference: unknown /* NativeElementReference */,
+-  ) => ReadonlyArray<number> /* [scrollLeft: number, scrollTop: number] */;
++  ) => $ReadOnlyArray<number> /* [scrollLeft: number, scrollTop: number] */;
+ 
+   +getScrollSize: (
+     nativeElementReference: unknown /* NativeElementReference */,
+-  ) => ReadonlyArray<number> /* [scrollWidth: number, scrollHeight: number] */;
++  ) => $ReadOnlyArray<number> /* [scrollWidth: number, scrollHeight: number] */;
+ 
+   +getTagName: (
+     nativeElementReference: unknown /* NativeElementReference */,
+@@ -127,7 +127,7 @@ export interface Spec extends TurboModule {
+ 
+   +getOffset: (
+     nativeElementReference: unknown /* NativeElementReference */,
+-  ) => ReadonlyArray<unknown> /* [offsetParent: ?InstanceHandle, top: number, left: number] */;
++  ) => $ReadOnlyArray<unknown> /* [offsetParent: ?InstanceHandle, top: number, left: number] */;
+ 
+   /*
+    * Special methods to handle the root node.
+@@ -199,7 +199,7 @@ export interface RefinedSpec {
+    */
+   +getChildNodes: (
+     nativeNodeReference: NativeNodeReference,
+-  ) => ReadonlyArray<InstanceHandle>;
++  ) => $ReadOnlyArray<InstanceHandle>;
+ 
+   /**
+    * This is a React Native implementation of `Document.prototype.getElementById`
+diff --git a/node_modules/react-native/src/private/webapis/dom/oldstylecollections/HTMLCollection.js b/node_modules/react-native/src/private/webapis/dom/oldstylecollections/HTMLCollection.js
+index 2688b79..92c66ee 100644
+--- a/node_modules/react-native/src/private/webapis/dom/oldstylecollections/HTMLCollection.js
++++ b/node_modules/react-native/src/private/webapis/dom/oldstylecollections/HTMLCollection.js
+@@ -35,7 +35,7 @@ export default class HTMLCollection<T> implements Iterable<T>, ArrayLike<T> {
+    * @private This is not defined in the declaration file, so users will not see
+    *          the signature of the constructor.
+    */
+-  constructor(elements: ReadonlyArray<T>) {
++  constructor(elements: $ReadOnlyArray<T>) {
+     for (let i = 0; i < elements.length; i++) {
+       REUSABLE_PROPERTY_DESCRIPTOR.value = elements[i];
+       Object.defineProperty(this, i, REUSABLE_PROPERTY_DESCRIPTOR);
+@@ -82,7 +82,7 @@ setPlatformObject(HTMLCollection);
+  * `HTMLCollection.js.flow`, not here.
+  */
+ export function createHTMLCollection<T>(
+-  elements: ReadonlyArray<T>,
++  elements: $ReadOnlyArray<T>,
+ ): HTMLCollection<T> {
+   return new HTMLCollection(elements);
+ }
+diff --git a/node_modules/react-native/src/private/webapis/dom/oldstylecollections/HTMLCollection.js.flow b/node_modules/react-native/src/private/webapis/dom/oldstylecollections/HTMLCollection.js.flow
+index b024dfc..b4374fe 100644
+--- a/node_modules/react-native/src/private/webapis/dom/oldstylecollections/HTMLCollection.js.flow
++++ b/node_modules/react-native/src/private/webapis/dom/oldstylecollections/HTMLCollection.js.flow
+@@ -25,5 +25,5 @@ declare export default class HTMLCollection<+T>
+ }
+ 
+ declare export function createHTMLCollection<T>(
+-  elements: ReadonlyArray<T>,
++  elements: $ReadOnlyArray<T>,
+ ): HTMLCollection<T>;
+diff --git a/node_modules/react-native/src/private/webapis/dom/oldstylecollections/NodeList.js b/node_modules/react-native/src/private/webapis/dom/oldstylecollections/NodeList.js
+index 4d19d16..a2443ea 100644
+--- a/node_modules/react-native/src/private/webapis/dom/oldstylecollections/NodeList.js
++++ b/node_modules/react-native/src/private/webapis/dom/oldstylecollections/NodeList.js
+@@ -37,7 +37,7 @@ export default class NodeList<T> implements Iterable<T>, ArrayLike<T> {
+    * @private This is not defined in the declaration file, so users will not see
+    *          the signature of the constructor.
+    */
+-  constructor(elements: ReadonlyArray<T>) {
++  constructor(elements: $ReadOnlyArray<T>) {
+     for (let i = 0; i < elements.length; i++) {
+       REUSABLE_PROPERTY_DESCRIPTOR.value = elements[i];
+       Object.defineProperty(this, i, REUSABLE_PROPERTY_DESCRIPTOR);
+@@ -105,6 +105,6 @@ setPlatformObject(NodeList);
+  * We can do that because the external definition of `NodeList` lives in
+  * `NodeList.js.flow`, not here.
+  */
+-export function createNodeList<T>(elements: ReadonlyArray<T>): NodeList<T> {
++export function createNodeList<T>(elements: $ReadOnlyArray<T>): NodeList<T> {
+   return new NodeList(elements);
+ }
+diff --git a/node_modules/react-native/src/private/webapis/dom/oldstylecollections/NodeList.js.flow b/node_modules/react-native/src/private/webapis/dom/oldstylecollections/NodeList.js.flow
+index ee11d70..1c66478 100644
+--- a/node_modules/react-native/src/private/webapis/dom/oldstylecollections/NodeList.js.flow
++++ b/node_modules/react-native/src/private/webapis/dom/oldstylecollections/NodeList.js.flow
+@@ -30,5 +30,5 @@ declare export default class NodeList<+T> implements Iterable<T>, ArrayLike<T> {
+ }
+ 
+ declare export function createNodeList<T>(
+-  elements: ReadonlyArray<T>,
++  elements: $ReadOnlyArray<T>,
+ ): NodeList<T>;
+diff --git a/node_modules/react-native/src/private/webapis/geometry/DOMRectList.js b/node_modules/react-native/src/private/webapis/geometry/DOMRectList.js
+index e56ba2f..5da2966 100644
+--- a/node_modules/react-native/src/private/webapis/geometry/DOMRectList.js
++++ b/node_modules/react-native/src/private/webapis/geometry/DOMRectList.js
+@@ -29,7 +29,7 @@ export default class DOMRectList implements Iterable<DOMRectReadOnly> {
+    * @private This is not defined in the declaration file, so users will not see
+    *          the signature of the constructor.
+    */
+-  constructor(elements: ReadonlyArray<DOMRectReadOnly>) {
++  constructor(elements: $ReadOnlyArray<DOMRectReadOnly>) {
+     for (let i = 0; i < elements.length; i++) {
+       Object.defineProperty(this, i, {
+         value: elements[i],
+@@ -73,7 +73,7 @@ setPlatformObject(DOMRectList);
+  * `DOMRectList.js.flow`, not here.
+  */
+ export function createDOMRectList(
+-  elements: ReadonlyArray<DOMRectReadOnly>,
++  elements: $ReadOnlyArray<DOMRectReadOnly>,
+ ): DOMRectList {
+   return new DOMRectList(elements);
+ }
+diff --git a/node_modules/react-native/src/private/webapis/geometry/DOMRectList.js.flow b/node_modules/react-native/src/private/webapis/geometry/DOMRectList.js.flow
+index 1e31dc9..863d43e 100644
+--- a/node_modules/react-native/src/private/webapis/geometry/DOMRectList.js.flow
++++ b/node_modules/react-native/src/private/webapis/geometry/DOMRectList.js.flow
+@@ -23,5 +23,5 @@ declare export default class DOMRectList
+ }
+ 
+ declare export function createDOMRectList(
+-  domRects: ReadonlyArray<DOMRectReadOnly>,
++  domRects: $ReadOnlyArray<DOMRectReadOnly>,
+ ): DOMRectList;
+diff --git a/node_modules/react-native/src/private/webapis/intersectionobserver/IntersectionObserver.js b/node_modules/react-native/src/private/webapis/intersectionobserver/IntersectionObserver.js
+index 2d723e8..00a8f6c 100644
+--- a/node_modules/react-native/src/private/webapis/intersectionobserver/IntersectionObserver.js
++++ b/node_modules/react-native/src/private/webapis/intersectionobserver/IntersectionObserver.js
+@@ -25,7 +25,7 @@ export type IntersectionObserverCallback = (
+ export interface IntersectionObserverInit {
+   root?: ?ReactNativeElement;
+   rootMargin?: string;
+-  threshold?: number | ReadonlyArray<number>;
++  threshold?: number | $ReadOnlyArray<number>;
+ 
+   /**
+    * This is a React Native specific option (not spec compliant) that specifies
+@@ -37,7 +37,7 @@ export interface IntersectionObserverInit {
+    * Note: If `rnRootThreshold` is set, and `threshold` is not set,
+    * `threshold` will not default to [0] (as per spec)
+    */
+-  rnRootThreshold?: number | ReadonlyArray<number>;
++  rnRootThreshold?: number | $ReadOnlyArray<number>;
+ }
+ 
+ /**
+@@ -62,10 +62,10 @@ export interface IntersectionObserverInit {
+  */
+ export default class IntersectionObserver {
+   _callback: IntersectionObserverCallback;
+-  _thresholds: ReadonlyArray<number>;
++  _thresholds: $ReadOnlyArray<number>;
+   _observationTargets: Set<ReactNativeElement> = new Set();
+   _intersectionObserverId: ?IntersectionObserverId;
+-  _rootThresholds: ReadonlyArray<number> | null;
++  _rootThresholds: $ReadOnlyArray<number> | null;
+   _root: ReactNativeElement | null;
+   _rootMargin: string;
+ 
+@@ -155,7 +155,7 @@ export default class IntersectionObserver {
+    * If no value was passed to the constructor, and no `rnRootThreshold`
+    * is set, `0` is used.
+    */
+-  get thresholds(): ReadonlyArray<number> {
++  get thresholds(): $ReadOnlyArray<number> {
+     return this._thresholds;
+   }
+ 
+@@ -166,7 +166,7 @@ export default class IntersectionObserver {
+    * Notifications for a target are generated when any of the thresholds specified
+    * in `rnRootThreshold` or `threshold` are crossed for that target.
+    */
+-  get rnRootThresholds(): ReadonlyArray<number> | null {
++  get rnRootThresholds(): $ReadOnlyArray<number> | null {
+     return this._rootThresholds;
+   }
+ 
+@@ -317,7 +317,7 @@ setPlatformObject(IntersectionObserver);
+ function normalizeThreshold(
+   threshold: unknown,
+   defaultEmpty: boolean = false,
+-): ReadonlyArray<number> {
++): $ReadOnlyArray<number> {
+   if (Array.isArray(threshold)) {
+     if (threshold.length > 0) {
+       return threshold
+@@ -354,7 +354,7 @@ function normalizeThreshold(
+  */
+ function normalizeRootThreshold(
+   rootThreshold: unknown,
+-): null | ReadonlyArray<number> {
++): null | $ReadOnlyArray<number> {
+   if (Array.isArray(rootThreshold)) {
+     const normalizedArr = rootThreshold
+       .map(rt => normalizeThresholdValue(rt, 'rnRootThreshold'))
+diff --git a/node_modules/react-native/src/private/webapis/intersectionobserver/specs/NativeIntersectionObserver.js b/node_modules/react-native/src/private/webapis/intersectionobserver/specs/NativeIntersectionObserver.js
+index f2fd6f1..582236b 100644
+--- a/node_modules/react-native/src/private/webapis/intersectionobserver/specs/NativeIntersectionObserver.js
++++ b/node_modules/react-native/src/private/webapis/intersectionobserver/specs/NativeIntersectionObserver.js
+@@ -15,10 +15,10 @@ import * as TurboModuleRegistry from '../../../../../Libraries/TurboModule/Turbo
+ export type NativeIntersectionObserverEntry = {
+   intersectionObserverId: number,
+   targetInstanceHandle: unknown,
+-  targetRect: ReadonlyArray<number>, // It's actually a tuple with x, y, width and height
+-  rootRect: ReadonlyArray<number>, // It's actually a tuple with x, y, width and height
++  targetRect: $ReadOnlyArray<number>, // It's actually a tuple with x, y, width and height
++  rootRect: $ReadOnlyArray<number>, // It's actually a tuple with x, y, width and height
+   // TODO(T209328432) - Remove optionality of intersectionRect when native changes are released
+-  intersectionRect: ?ReadonlyArray<number>, // It's actually a tuple with x, y, width and height
++  intersectionRect: ?$ReadOnlyArray<number>, // It's actually a tuple with x, y, width and height
+   isIntersectingAboveThresholds: boolean,
+   time: number,
+ };
+@@ -27,8 +27,8 @@ export type NativeIntersectionObserverObserveOptions = {
+   intersectionObserverId: number,
+   rootShadowNode?: ?unknown,
+   targetShadowNode: unknown,
+-  thresholds: ReadonlyArray<number>,
+-  rootThresholds?: ?ReadonlyArray<number>,
++  thresholds: $ReadOnlyArray<number>,
++  rootThresholds?: ?$ReadOnlyArray<number>,
+   rootMargin?: ?string,
+ };
+ 
+@@ -44,7 +44,7 @@ export interface Spec extends TurboModule {
+   ) => void;
+   +connect: (notifyIntersectionObserversCallback: () => void) => void;
+   +disconnect: () => void;
+-  +takeRecords: () => ReadonlyArray<NativeIntersectionObserverEntry>;
++  +takeRecords: () => $ReadOnlyArray<NativeIntersectionObserverEntry>;
+ }
+ 
+ export default TurboModuleRegistry.get<Spec>(
+diff --git a/node_modules/react-native/src/private/webapis/mutationobserver/MutationObserver.js b/node_modules/react-native/src/private/webapis/mutationobserver/MutationObserver.js
+index 9917c88..daca50a 100644
+--- a/node_modules/react-native/src/private/webapis/mutationobserver/MutationObserver.js
++++ b/node_modules/react-native/src/private/webapis/mutationobserver/MutationObserver.js
+@@ -18,7 +18,7 @@ import {setPlatformObject} from '../webidl/PlatformObjects';
+ import * as MutationObserverManager from './internals/MutationObserverManager';
+ 
+ export type MutationObserverCallback = (
+-  mutationRecords: ReadonlyArray<MutationRecord>,
++  mutationRecords: $ReadOnlyArray<MutationRecord>,
+   observer: MutationObserver,
+ ) => unknown;
+ 
+@@ -29,7 +29,7 @@ export interface MutationObserverInit {
+ 
+   // Unsupported:
+   +attributes?: boolean;
+-  +attributeFilter?: ReadonlyArray<string>;
++  +attributeFilter?: $ReadOnlyArray<string>;
+   +attributeOldValue?: boolean;
+   +characterData?: boolean;
+   +characterDataOldValue?: boolean;
+diff --git a/node_modules/react-native/src/private/webapis/mutationobserver/MutationRecord.js b/node_modules/react-native/src/private/webapis/mutationobserver/MutationRecord.js
+index 01da2b1..42f7812 100644
+--- a/node_modules/react-native/src/private/webapis/mutationobserver/MutationRecord.js
++++ b/node_modules/react-native/src/private/webapis/mutationobserver/MutationRecord.js
+@@ -35,9 +35,9 @@ export default class MutationRecord {
+     const target: ReactNativeElement = nativeRecord.target;
+     this._target = target;
+     // $FlowExpectedError[incompatible-type] the codegen doesn't support the actual type.
+-    const addedNodes: ReadonlyArray<ReadOnlyNode> = nativeRecord.addedNodes;
++    const addedNodes: $ReadOnlyArray<ReadOnlyNode> = nativeRecord.addedNodes;
+     this._addedNodes = createNodeList(addedNodes);
+-    const removedNodes: ReadonlyArray<ReadOnlyNode> =
++    const removedNodes: $ReadOnlyArray<ReadOnlyNode> =
+       // $FlowFixMe[incompatible-type]
+       nativeRecord.removedNodes;
+     this._removedNodes = createNodeList(removedNodes);
+diff --git a/node_modules/react-native/src/private/webapis/mutationobserver/internals/MutationObserverManager.js b/node_modules/react-native/src/private/webapis/mutationobserver/internals/MutationObserverManager.js
+index 21c7698..a929b5d 100644
+--- a/node_modules/react-native/src/private/webapis/mutationobserver/internals/MutationObserverManager.js
++++ b/node_modules/react-native/src/private/webapis/mutationobserver/internals/MutationObserverManager.js
+@@ -38,7 +38,7 @@ let isConnected: boolean = false;
+ 
+ const registeredMutationObservers: Map<
+   MutationObserverId,
+-  Readonly<{observer: MutationObserver, callback: MutationObserverCallback}>,
++  $ReadOnly<{observer: MutationObserver, callback: MutationObserverCallback}>,
+ > = new Map();
+ 
+ /**
+diff --git a/node_modules/react-native/src/private/webapis/mutationobserver/specs/NativeMutationObserver.js b/node_modules/react-native/src/private/webapis/mutationobserver/specs/NativeMutationObserver.js
+index 62c92ba..0621339 100644
+--- a/node_modules/react-native/src/private/webapis/mutationobserver/specs/NativeMutationObserver.js
++++ b/node_modules/react-native/src/private/webapis/mutationobserver/specs/NativeMutationObserver.js
+@@ -23,8 +23,8 @@ type ReadOnlyNode = unknown;
+ export type NativeMutationRecord = {
+   mutationObserverId: MutationObserverId,
+   target: ReactNativeElement,
+-  addedNodes: ReadonlyArray<ReadOnlyNode>,
+-  removedNodes: ReadonlyArray<ReadOnlyNode>,
++  addedNodes: $ReadOnlyArray<ReadOnlyNode>,
++  removedNodes: $ReadOnlyArray<ReadOnlyNode>,
+   ...
+ };
+ 
+@@ -47,7 +47,7 @@ export interface Spec extends TurboModule {
+     ) => ReadOnlyNode,
+   ) => void;
+   +disconnect: () => void;
+-  +takeRecords: () => ReadonlyArray<NativeMutationRecord>;
++  +takeRecords: () => $ReadOnlyArray<NativeMutationRecord>;
+ }
+ 
+ export default TurboModuleRegistry.get<Spec>(
+diff --git a/node_modules/react-native/src/private/webapis/performance/LongTasks.js b/node_modules/react-native/src/private/webapis/performance/LongTasks.js
+index 2238444..d5267c8 100644
+--- a/node_modules/react-native/src/private/webapis/performance/LongTasks.js
++++ b/node_modules/react-native/src/private/webapis/performance/LongTasks.js
+@@ -18,7 +18,7 @@ import {PerformanceEntry} from './PerformanceEntry';
+ 
+ export type PerformanceLongTaskTimingJSON = {
+   ...PerformanceEntryJSON,
+-  attribution: ReadonlyArray<TaskAttributionTiming>,
++  attribution: $ReadOnlyArray<TaskAttributionTiming>,
+   ...
+ };
+ 
+@@ -36,7 +36,7 @@ export const TaskAttributionTiming_public: typeof TaskAttributionTiming =
+ // $FlowExpectedError[prop-missing]
+ TaskAttributionTiming_public.prototype = TaskAttributionTiming.prototype;
+ 
+-const EMPTY_ATTRIBUTION: ReadonlyArray<TaskAttributionTiming> =
++const EMPTY_ATTRIBUTION: $ReadOnlyArray<TaskAttributionTiming> =
+   Object.preventExtensions([]);
+ 
+ export interface PerformanceLongTaskTimingInit extends PerformanceEntryInit {}
+@@ -46,7 +46,7 @@ export class PerformanceLongTaskTiming extends PerformanceEntry {
+     super('longtask', init);
+   }
+ 
+-  get attribution(): ReadonlyArray<TaskAttributionTiming> {
++  get attribution(): $ReadOnlyArray<TaskAttributionTiming> {
+     return EMPTY_ATTRIBUTION;
+   }
+ 
+diff --git a/node_modules/react-native/src/private/webapis/performance/Performance.js b/node_modules/react-native/src/private/webapis/performance/Performance.js
+index 6a49206..fa03971 100644
+--- a/node_modules/react-native/src/private/webapis/performance/Performance.js
++++ b/node_modules/react-native/src/private/webapis/performance/Performance.js
+@@ -37,23 +37,23 @@ import {PerformanceMark, PerformanceMeasure} from './UserTiming';
+ import nullthrows from 'nullthrows';
+ 
+ export type PerformanceMeasureOptions =
+-  | Readonly<{
++  | $ReadOnly<{
+       detail?: DetailType,
+       start?: DOMHighResTimeStamp | string,
+       duration?: DOMHighResTimeStamp,
+     }>
+-  | Readonly<{
++  | $ReadOnly<{
+       detail?: DetailType,
+       start?: DOMHighResTimeStamp | string,
+       end?: DOMHighResTimeStamp | string,
+     }>
+-  | Readonly<{
++  | $ReadOnly<{
+       detail?: DetailType,
+       duration?: DOMHighResTimeStamp | string,
+       end?: DOMHighResTimeStamp | string,
+     }>;
+ 
+-const ENTRY_TYPES_AVAILABLE_FROM_TIMELINE: ReadonlyArray<PerformanceEntryType> =
++const ENTRY_TYPES_AVAILABLE_FROM_TIMELINE: $ReadOnlyArray<PerformanceEntryType> =
+   ['mark', 'measure'];
+ 
+ const NativePerformance = nullthrows(MaybeNativePerformance);
+diff --git a/node_modules/react-native/src/private/webapis/performance/PerformanceEntry.js b/node_modules/react-native/src/private/webapis/performance/PerformanceEntry.js
+index 550f6b8..03e4b67 100644
+--- a/node_modules/react-native/src/private/webapis/performance/PerformanceEntry.js
++++ b/node_modules/react-native/src/private/webapis/performance/PerformanceEntry.js
+@@ -91,4 +91,4 @@ PerformanceEntry_public.prototype = PerformanceEntry.prototype;
+ 
+ setPlatformObject(PerformanceEntry);
+ 
+-export type PerformanceEntryList = ReadonlyArray<PerformanceEntry>;
++export type PerformanceEntryList = $ReadOnlyArray<PerformanceEntry>;
+diff --git a/node_modules/react-native/src/private/webapis/performance/PerformanceObserver.js b/node_modules/react-native/src/private/webapis/performance/PerformanceObserver.js
+index c1b2a47..375c49a 100644
+--- a/node_modules/react-native/src/private/webapis/performance/PerformanceObserver.js
++++ b/node_modules/react-native/src/private/webapis/performance/PerformanceObserver.js
+@@ -88,7 +88,7 @@ export interface PerformanceObserverInit {
+   +durationThreshold?: DOMHighResTimeStamp;
+ }
+ 
+-function getSupportedPerformanceEntryTypes(): ReadonlyArray<PerformanceEntryType> {
++function getSupportedPerformanceEntryTypes(): $ReadOnlyArray<PerformanceEntryType> {
+   return Object.freeze(
+     NativePerformance.getSupportedPerformanceEntryTypes().map(
+       rawToPerformanceEntryType,
+@@ -237,7 +237,7 @@ export class PerformanceObserver {
+     }
+   }
+ 
+-  static supportedEntryTypes: ReadonlyArray<PerformanceEntryType> =
++  static supportedEntryTypes: $ReadOnlyArray<PerformanceEntryType> =
+     getSupportedPerformanceEntryTypes();
+ }
+ 
+diff --git a/node_modules/react-native/src/private/webapis/performance/specs/NativePerformance.js b/node_modules/react-native/src/private/webapis/performance/specs/NativePerformance.js
+index ccbb4c0..b646002 100644
+--- a/node_modules/react-native/src/private/webapis/performance/specs/NativePerformance.js
++++ b/node_modules/react-native/src/private/webapis/performance/specs/NativePerformance.js
+@@ -46,10 +46,10 @@ export opaque type OpaqueNativeObserverHandle = unknown;
+ 
+ export type NativeBatchedObserverCallback = () => void;
+ export type NativePerformanceMarkResult = number;
+-export type NativePerformanceMeasureResult = ReadonlyArray<number>; // [startTime, duration]
++export type NativePerformanceMeasureResult = $ReadOnlyArray<number>; // [startTime, duration]
+ 
+ export type PerformanceObserverInit = {
+-  entryTypes?: ReadonlyArray<number>,
++  entryTypes?: $ReadOnlyArray<number>,
+   type?: number,
+   buffered?: boolean,
+   durationThreshold?: number,
+@@ -69,15 +69,15 @@ export interface Spec extends TurboModule {
+   +getMarkTime: (name: string) => ?number;
+   +clearMarks: (entryName?: string) => void;
+   +clearMeasures: (entryName?: string) => void;
+-  +getEntries: () => ReadonlyArray<RawPerformanceEntry>;
++  +getEntries: () => $ReadOnlyArray<RawPerformanceEntry>;
+   +getEntriesByName: (
+     entryName: string,
+     entryType?: ?RawPerformanceEntryType,
+-  ) => ReadonlyArray<RawPerformanceEntry>;
++  ) => $ReadOnlyArray<RawPerformanceEntry>;
+   +getEntriesByType: (
+     entryType: RawPerformanceEntryType,
+-  ) => ReadonlyArray<RawPerformanceEntry>;
+-  +getEventCounts: () => ReadonlyArray<[string, number]>;
++  ) => $ReadOnlyArray<RawPerformanceEntry>;
++  +getEventCounts: () => $ReadOnlyArray<[string, number]>;
+   +getSimpleMemoryInfo: () => NativeMemoryInfo;
+   +getReactNativeStartupTiming: () => ReactNativeStartupTiming;
+ 
+@@ -94,9 +94,9 @@ export interface Spec extends TurboModule {
+   +takeRecords: (
+     observer: OpaqueNativeObserverHandle,
+     sort: boolean,
+-  ) => ReadonlyArray<RawPerformanceEntry>;
++  ) => $ReadOnlyArray<RawPerformanceEntry>;
+ 
+-  +getSupportedPerformanceEntryTypes: () => ReadonlyArray<RawPerformanceEntryType>;
++  +getSupportedPerformanceEntryTypes: () => $ReadOnlyArray<RawPerformanceEntryType>;
+ 
+   +clearEventCountsForTesting: () => void;
+ }
